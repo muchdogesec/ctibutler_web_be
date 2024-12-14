@@ -1,0 +1,63 @@
+name: Create and publish the Docker image for Ctibutler Web Staging
+
+on:
+  push:
+    branches: ['main']
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}_ctibutler_web_staging
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    environment: ctibutler_web_staging
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write 
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      - name: Build and push Docker image
+        id: push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile.deploy
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            AUTH0_LOGIN_DOMAIN=auth.signalscorps.com
+            AUTH0_DOMAIN=dogesec-staging.eu.auth0.com
+            AUTH0_CLIENT_ID=WH917SKYM44IYxub2lwDo8we8ORrpgIl
+            AUTH0_WEB_CLIENT_ID=a303hUqsYlT6R1nw5BKCCMf9mhrUfjPX
+            AUTH0_CLIENT_SECRET=${{ secrets.AUTH0_CLIENT_SECRET }}
+            AUTH0_WEB_CLIENT_SECRET=${{ secrets.AUTH0_WEB_CLIENT_SECRET }}
+            FRONTEND_BASE_URL=https://app.ctibutler.staging.signalscorps.com
+            SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }}
+            CSRF_TRUSTED_ORIGINS=https://management.ctibutler.staging.signalscorps.com
+            POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+            STRIPE_LIVE_MODE=false
+            STRIPE_PUBLIC_KEY=pk_test_51QUSJWEJSB4nwJ6WM3st14VhCK8mxNcTRcFtb2Qiw1jkoxJyaGQ1cHSURedz7rXTBph45c0cD5QskSt2znzNPwPU00C6U9sHQQ
+            STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}
+            DEFAULT_STRIPE_PRICE_ID=price_1QPAjWCl5fFMWEhTN4p4P6N2
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true
