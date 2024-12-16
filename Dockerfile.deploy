@@ -41,8 +41,8 @@ ENV SMTP_USERNAME=731598001@smtp-brevo.com
 ENV SMTP_SERVER=smtp-relay.brevo.com
 ENV SMTP_PORT=587
 ENV USE_SSL=TRUE
-ENV POSTGRES_USER=obstracts_web_be
-ENV POSTGRES_DB=obstracts_web_database
+ENV POSTGRES_USER=ctibutler_web_be
+ENV POSTGRES_DB=ctibutler_web_database
 ENV POSTGRES_HOST=host.docker.internal
 ENV POSTGRES_PORT=5432
 

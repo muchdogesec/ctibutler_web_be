@@ -1,4 +1,4 @@
-name: Create and publish the Docker image for Ctibutler Web Staging
+name: Create and publish the Docker image for CTI Butler Web Staging
 
 on:
   push:
