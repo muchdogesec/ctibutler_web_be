@@ -4,6 +4,8 @@ from django.views import View
 import os
 from importlib import import_module
 from collections import namedtuple
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAdminUser
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from drf_spectacular.settings import patched_settings, spectacular_settings
@@ -120,7 +122,7 @@ class SchemaView(APIView):
                 self.urlconf = ModuleWrapper(tuple(self.urlconf))
         api_schema = self._get_schema_response(request)
 
-        schema_path = os.path.join('ctibutler_api', 'templates', 'ctibutler_api', 'schema.json')
+        schema_path = self.get_schema_path()
         with open(schema_path) as schema_file:
             ctibutler_schema = json.load(schema_file)
 
@@ -164,25 +166,11 @@ class SchemaView(APIView):
         merged_components['schemas'] = new_schema_dict
         return JsonResponse(merged_swagger)
 
+    def get_schema_path(self):
+        return os.path.join('ctibutler_api', 'templates', 'ctibutler_api', 'schema.json')
+    
     def _get_schema_response(self, request):
-        # version specified as parameter to the view always takes precedence. after
-        # that we try to source version through the schema view's own versioning_class.
-        version = self.api_version or request.version or self._get_version_parameter(request)
-        generator = self.generator_class(urlconf=self.urlconf, api_version=version, patterns=self.patterns)
-        data = generator.get_schema(request=request, public=self.serve_public)
-        path_items = data["paths"].items()
-
-        filtered_paths = list(filter(lambda item: '/api/v1/feeds/' in item[0] and "get" in item[1], path_items))
-        path_dict = {}
-        security_requirement = [{'api_key': []}]
-        for key, value in filtered_paths:
-            get_value = value["get"]
-            get_value['security'] = security_requirement
-            get_value['tags'] = ["Feeds"]
-            path_dict[key] = {"get": get_value}
-
-        data["paths"] = path_dict
-        return data
+        return {}
 
     def _get_filename(self, request, version):
         return "{title}{version}.{suffix}".format(
@@ -193,3 +181,10 @@ class SchemaView(APIView):
 
     def _get_version_parameter(self, request):
         return None
+
+class AdminSchemaView(SchemaView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAdminUser]
+
+    def get_schema_path(self):
+        return os.path.join('ctibutler_api', 'templates', 'ctibutler_api', 'admin-schema.json')

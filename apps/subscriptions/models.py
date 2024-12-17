@@ -113,3 +113,8 @@ class SubscriptionConfig(models.Model):
             hours=int(data_dict.get('subscription_trial_duration_hours', 0)),
             minutes=int(data_dict.get('subscription_trial_duration_minutes', 0)),
         )
+
+
+    @staticmethod
+    def get_default_price_id():
+        return SubscriptionConfig.objects.get(key='subscription_default_price').value
