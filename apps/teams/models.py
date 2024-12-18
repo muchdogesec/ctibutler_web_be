@@ -37,7 +37,7 @@ class Team(BaseModel, SubscriptionModelBase):
     def get_allowed_api_access(self):
         if not self.active_stripe_subscription:
             return False
-        return self.subscription.plan.product.metadata.get('allowed_data_download', '') == 'true'
+        return self.subscription.plan.product.metadata.get('allowed_api_access', '') == 'true'
 
     @property
     def allowed_api_access(self):
