@@ -32,8 +32,7 @@ def merge_paths(paths1, paths2):
     
     def add_to_merged_dict(paths):
         for original_path, methods in paths.items():
-            # path = original_path.replace('/ctibutler_api/api/v1/', '/v1/')
-            path = original_path
+            path = original_path.replace('/ctibutler_api/api/v1/', '/v1/')
             if path not in merged:
                 merged[path] = methods
             else:
