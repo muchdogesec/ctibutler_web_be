@@ -217,7 +217,7 @@ class UserManagementViewSet(viewsets.GenericViewSet):
                     "data": {
                         "totp_secret": totp_secret,
                         "totp_uri": pyotp.TOTP(totp_secret).provisioning_uri(
-                            name=request.user.email, issuer_name="citibutler"
+                            name=request.user.email, issuer_name="ctibutler"
                         ),
                     },
                 },

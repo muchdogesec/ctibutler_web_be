@@ -14,7 +14,7 @@ def update_user_metadata(django_user_id):
 
     user = CustomUser.objects.get(id=django_user_id)
     team_ids = [str(team.id) for team in user.teams.all()]
-    data = {"app_metadata": {"citibutler": { "user_id": str(django_user_id), "is_staff": user.is_staff, "team_ids": team_ids }}}
+    data = {"app_metadata": {"ctibutler": { "user_id": str(django_user_id), "is_staff": user.is_staff, "team_ids": team_ids }}}
     update_auth0_user(
         auth0_user_id, data, auth0_token
     )

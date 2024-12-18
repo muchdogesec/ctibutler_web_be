@@ -2,7 +2,7 @@
 
 ## Overview
 
-The back end for [Citibutler](https://www.citibutler.com/).
+The back end for [Citibutler](https://www.ctibutler.com/).
 
 ## Support
 

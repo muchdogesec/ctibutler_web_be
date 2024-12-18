@@ -184,7 +184,7 @@ else:
             "ENGINE": "django.db.backends.postgresql",
             "HOST": env("POSTGRES_HOST", default="localhost"),
             "PORT": env("POSTGRES_PORT", default="5432"),
-            "NAME": env("POSTGRES_DB", default="citibutler_web"),
+            "NAME": env("POSTGRES_DB", default="ctibutler_web"),
             "USER": env("POSTGRES_USER", default="postgres"),
             "PASSWORD": env("POSTGRES_PASSWORD", default="***"),
         }
@@ -475,7 +475,7 @@ LOGGING = {
             "handlers": ["console"],
             "level": env("DJANGO_LOG_LEVEL", default="INFO"),
         },
-        "citibutler_web": {
+        "ctibutler_web": {
             "handlers": ["console"],
             "level": env("CITBUTLER_WEB_LOG_LEVEL", default="INFO"),
         },
