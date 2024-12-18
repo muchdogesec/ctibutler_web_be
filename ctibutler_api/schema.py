@@ -148,7 +148,12 @@ class SchemaView(APIView):
             'components': merged_components,
             'paths': merged_paths
         }
+        
+        self.resolve_schemas(merged_swagger)
+        return JsonResponse(merged_swagger)
 
+    def resolve_schemas(self, merged_swagger):
+        merged_components = merged_swagger['components']
         schema = extract_paths_and_schemas(merged_swagger)
         new_schema_dict = {}
         schemas = merged_components['schemas']
@@ -163,7 +168,6 @@ class SchemaView(APIView):
             new_schema_dict[ref_key] = schemas[ref_key]
 
         merged_components['schemas'] = new_schema_dict
-        return JsonResponse(merged_swagger)
 
     def get_schema_path(self):
         return os.path.join('ctibutler_api', 'templates', 'ctibutler_api', 'schema.json')
@@ -184,6 +188,9 @@ class SchemaView(APIView):
 class AdminSchemaView(SchemaView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAdminUser]
+
+    def resolve_schemas(self, merged_swagger):
+        pass
 
     def get_schema_path(self):
         return os.path.join('ctibutler_api', 'templates', 'ctibutler_api', 'admin-schema.json')

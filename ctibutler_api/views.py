@@ -95,7 +95,7 @@ class AdminCtiButlerProxyView(APIView):
                 method=request.method,
                 url=target_url,
                 headers=headers,
-                data=request.body,
+                json=request.data,
                 params={key: value for key, value in request.GET.items()},
                 allow_redirects=False,
             )
