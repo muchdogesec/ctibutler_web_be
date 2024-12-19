@@ -1,5 +1,5 @@
 """
-WSGI config for Citibutler Web project.
+WSGI config for CTI Butler Web project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 

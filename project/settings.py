@@ -1,5 +1,5 @@
 """
-Django settings for Citibutler Web project.
+Django settings for CTI Butler Web project.
 
 For more information on this file, see
 https://docs.djangoproject.com/en/stable/topics/settings/
@@ -351,7 +351,7 @@ EMAIL_BACKEND = env(
 # see https://github.com/anymail/django-anymail for more details/examples
 # EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
 
-EMAIL_SUBJECT_PREFIX = "[Citibutler Web] "
+EMAIL_SUBJECT_PREFIX = "[CTI Butler Web] "
 
 # Django sites
 
@@ -374,8 +374,8 @@ REST_FRAMEWORK = {
 
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Citibutler Web",
-    "DESCRIPTION": "Turn any blog into structured threat intelligence",
+    "TITLE": "CTI Butler Web",
+    "DESCRIPTION": "One API. Much CTI.",
     "VERSION": "0.1.0",
     "SERVE_INCLUDE_SCHEMA": False,
     "SWAGGER_UI_SETTINGS": {
@@ -495,10 +495,10 @@ EMAIL_HOST_USER = env("SMTP_USERNAME")
 EMAIL_HOST_PASSWORD = env("SMTP_PASSWORD")
 
 PROJECT_METADATA = {
-    "NAME": gettext_lazy("Citibutler Web"),
+    "NAME": gettext_lazy("CTI Butler Web"),
     "URL": FRONTEND_BASE_URL,
     "DESCRIPTION": gettext_lazy(
-        "The most amazing SaaS application the world has ever seen"
+        "One API. Much CTI."
     ),
     "IMAGE": "https://upload.wikimedia.org/wikipedia/commons/2/20/PEO-pegasus_black.svg",
     "KEYWORDS": "SaaS, django",
