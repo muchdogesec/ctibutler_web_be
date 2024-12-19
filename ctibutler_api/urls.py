@@ -1,7 +1,8 @@
 from django.urls import path, include
+from django.contrib.auth.decorators import login_required
 from drf_spectacular.views import SpectacularSwaggerView
 
-from .schema import AdminSchemaView, SchemaView
+from .schema import AdminSchemaView, SchemaView, AdminSwaggerView
 from .views import (
     CtiButlerProxyView,
     AdminCtiButlerProxyView,
@@ -20,7 +21,7 @@ urlpatterns = [
     path('admin/schema/schema-json', AdminSchemaView.as_view(), name='admin-schema-json'),
     path(
         "admin/schema/swagger-ui/",
-        SpectacularSwaggerView.as_view(url="../schema-json"),
+        login_required(AdminSwaggerView.as_view(url="../schema-json")),
         name="swagger-ui",
     ),
 ]

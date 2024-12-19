@@ -32,7 +32,9 @@ class Team(BaseModel, SubscriptionModelBase):
         return self.name
 
     def get_user_limit(self):
-        return 10
+        if not self.active_stripe_subscription:
+            return 0
+        return int(self.subscription.plan.product.metadata.get('allowed_user_count', 0))
 
     def get_allowed_api_access(self):
         if not self.active_stripe_subscription:

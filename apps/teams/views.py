@@ -330,7 +330,6 @@ class AdminTeamViewSet(viewsets.ModelViewSet):
                 Q(invitations__is_accepted=False) &
                 Q(invitations__is_cancelled=False),
             ), distinct=True),
-            feed_count=Count('feeds', distinct=True)
         ).select_related('subscription')
 
 class TeamApiKeyViewSet(viewsets.ModelViewSet):
