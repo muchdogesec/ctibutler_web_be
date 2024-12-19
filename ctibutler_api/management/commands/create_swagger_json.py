@@ -13,7 +13,7 @@ CTIBUTLER_SERVICE_BASE_URL = settings.CTIBUTLER_SERVICE_BASE_URL
 class CtiButlerSchemaGenerator():
     def get_paths(self, data_json):
         path_items = data_json["paths"].items()
-        filtered_paths = list(filter(lambda item: "get" in item[1] and "schema" not in item[0], path_items))
+        filtered_paths = list(filter(lambda item: "get" in item[1] and "schema" not in item[0] and "jobs" not in item[0], path_items))
         path_dict = {}
         security_requirement = [{'api_key': []}]
         for key, value in filtered_paths:

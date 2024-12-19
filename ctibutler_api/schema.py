@@ -12,6 +12,7 @@ from drf_spectacular.settings import patched_settings, spectacular_settings
 from drf_spectacular.renderers import (
     OpenApiJsonRenderer, OpenApiJsonRenderer2, OpenApiYamlRenderer, OpenApiYamlRenderer2,
 )
+from drf_spectacular.views import SpectacularSwaggerView
 
 
 def merge_components(comp1, comp2):
@@ -194,3 +195,9 @@ class AdminSchemaView(SchemaView):
 
     def get_schema_path(self):
         return os.path.join('ctibutler_api', 'templates', 'ctibutler_api', 'admin-schema.json')
+
+from django.contrib.auth.decorators import login_required
+
+
+class AdminSwaggerView(SpectacularSwaggerView):
+    permission_classes = [IsAdminUser]
