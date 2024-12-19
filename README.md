@@ -1,8 +1,8 @@
-# Citibutler Web Backend
+# CTI Butler Web Backend
 
 ## Overview
 
-The back end for [Citibutler](https://www.ctibutler.com/).
+The back end for [CTI Butler](https://www.ctibutler.com/).
 
 ## Support
 
