@@ -142,9 +142,9 @@ class SchemaView(APIView):
         merged_swagger = {
             'openapi': '3.0.0',
             'info': {
-                'title': 'Ctibutler Web API',
+                'title': 'CTI Butler Web API',
                 'version': '1.0.0',
-                'description': '[Back to Ctibutler Web](https://app.ctibutler.com)'
+                'description': 'Generate a CTI Butler API Key in your Account Settings in the CTI Butler web app. This documentation is interactive. Click "Authorize", enter your API key, expand the endpoint you want to use, and click "Try it out".\n\n[Back to CTI Butler Web](https://app.ctibutler.com)'
             },
             'components': merged_components,
             'paths': merged_paths
