@@ -75,9 +75,13 @@ class TeamViewSet(viewsets.ModelViewSet):
         if self.action not in ['list', 'subscribe', 'unsubscribe']:
             if obj.is_private:
                 return self.permission_denied(request, "User has no permission to this team")
+        
+        if self.action == 'update':
+            if not is_admin(self.request.user, obj):
+                return self.permission_denied(request, "User has no permission to perform this action")
         if self.action == 'destroy':
             if not is_owner(self.request.user, obj):
-                return self.permission_denied(request, "User has no permission to delete this team")
+                return self.permission_denied(request, "User has no permission to perform this action")
         return True
 
     def perform_create(self, serializer):
@@ -113,6 +117,9 @@ class TeamViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["POST"], url_path="change-role")
     def change_role(self, *args, **kwargs):
         obj = self.get_object()
+        if not is_admin(self.request.user, obj):
+            raise PermissionDenied("Only team admins can change member role")
+        serializer = RemoveUserSerializer(data=self.request.data)
         serializer = ChangeUserTeamRoleSerializer(data=self.request.data)
         serializer.is_valid(raise_exception=True)
         user_id = serializer.validated_data["user_id"]
@@ -127,6 +134,8 @@ class TeamViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["POST"], url_path="remove-member")
     def remove_member(self, *args, **kwargs):
         obj = self.get_object()
+        if not is_admin(self.request.user, obj):
+            raise PermissionDenied("Only team admins can remove members")
         serializer = RemoveUserSerializer(data=self.request.data)
         serializer.is_valid(raise_exception=True)
         user_id = serializer.validated_data["user_id"]

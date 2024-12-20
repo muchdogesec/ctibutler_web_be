@@ -5,7 +5,7 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, inline_serializer
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, PermissionDenied
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
@@ -18,6 +18,7 @@ from apps.subscriptions.helpers import (
 from apps.subscriptions.wrappers import SubscriptionWrapper
 from apps.utils.billing import get_stripe_module
 from apps.api.permissions import IsAuthenticatedOrHasUserAPIKey
+from apps.teams.roles import is_admin
 
 from ..exceptions import SubscriptionConfigError
 from ..helpers import create_stripe_checkout_session, create_stripe_portal_session
@@ -41,6 +42,8 @@ class TeamSubscriptionViewSet(GenericViewSet, CreateModelMixin):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         subscription_holder = request.team
+        if not is_admin(self.request.user, subscription_holder):
+            raise PermissionDenied('User has no permission to modify subscription')
         price_id = serializer.validated_data.get("price_id")
         checkout_session = create_stripe_checkout_session(
             subscription_holder,
