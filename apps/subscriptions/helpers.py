@@ -209,6 +209,7 @@ def subscribe_team_to_initial_subscription(subscription_holder):
     subscription = stripe.Subscription.create(
         customer=customer_id,
         items=[{"price": default_price_id}],
+        trial_end=trial_end,
     )
     djstripe_subscription = Subscription.sync_from_stripe_data(subscription)
     subscription_holder.subscription = djstripe_subscription
