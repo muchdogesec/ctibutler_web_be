@@ -54,6 +54,7 @@ jobs:
             STRIPE_LIVE_MODE=true
             STRIPE_PUBLIC_KEY=pk_live_51QUSJWEJSB4nwJ6WAetevfgJtH3v3xMjagoODXYZbrm3sQYSG7glMpzxfkHyL8UwuSnc9NNOKenlUOEuYJFEYoki00MK3lgFNY
             STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}
+            DEFAULT_FROM_EMAIL=noreply@brevo.ctibutler.com
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v1
         with:
