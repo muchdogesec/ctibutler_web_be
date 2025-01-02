@@ -174,7 +174,27 @@ class SchemaView(APIView):
         return os.path.join('ctibutler_api', 'templates', 'ctibutler_api', 'schema.json')
     
     def _get_schema_response(self, request):
-        return {}
+        version = self.api_version or request.version or self._get_version_parameter(request)
+        generator = self.generator_class(urlconf=self.urlconf, api_version=version, patterns=self.patterns)
+        data = generator.get_schema(request=request, public=self.serve_public)
+        path_items = data["paths"].items()
+
+        filtered_paths = list(filter(lambda item: 'user' in item[0], path_items))
+        path_dict = {}
+        security_requirement = [{'api_key': []}]
+        for key, value in filtered_paths:
+            methods = value.keys()
+            for method in methods:
+                method_value = value[method]
+                operation_id = method_value['operationId']
+                if operation_id == 'users_admin_token_create':
+                    method_value['security'] = security_requirement
+                    method_value['tags'] = ["User"]
+                    path_dict[key] = {method: method_value}
+                    break
+
+        data["paths"] = path_dict
+        return data
 
     def _get_filename(self, request, version):
         return "{title}{version}.{suffix}".format(

@@ -18,6 +18,12 @@ router.register(
     basename="admin-user-management",
 )
 
+router.register(
+    "admin/token",
+    views.AdminTokenApiView,
+    basename='admin-token',
+)
+
 urlpatterns = [
     path("", include(router.urls)),
 ]

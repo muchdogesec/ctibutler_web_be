@@ -19,13 +19,13 @@ from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
 
 from rest_framework import filters
-from rest_framework.mixins import ListModelMixin
+from rest_framework.mixins import ListModelMixin, CreateModelMixin
 
 from apps.api.models import UserAPIKey
 
 from .models import CustomUser
 from .model_utils import make_user_staff_on_auth0, remove_user_from_staff_on_auth0
-from .serializers import ChangeEmailSerializer, VerifyOtpSerializer, UserSerializer
+from .serializers import ChangeEmailSerializer, VerifyOtpSerializer, UserSerializer, AdminUserTokenSerializer
 from .utils import get_auth0_headers, get_auth0_management_token, update_auth0_user
 
 
@@ -336,3 +336,8 @@ class UserAdminManagementViewSet(viewsets.GenericViewSet, ListModelMixin):
             },
             status=status.HTTP_200_OK,
         )
+
+
+class AdminTokenApiView(viewsets.GenericViewSet, CreateModelMixin):
+    permission_classes = [IsAdminUser]
+    serializer_class = AdminUserTokenSerializer
