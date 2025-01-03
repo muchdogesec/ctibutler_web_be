@@ -38,3 +38,16 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_teams(self, obj):
         return [{"name": str(membership.team.name), "id": str(membership.team.id), "owner_id": membership.team.owner_id} for membership in obj.membership_set.all()]
+
+from rest_framework.authtoken.models import Token
+
+class AdminUserTokenSerializer(serializers.Serializer):
+    token = serializers.CharField(read_only=True)
+
+    def create(self, *args, **kwargs):
+        view = self.context.get('view')
+        user = view.request.user
+        token, created = Token.objects.get_or_create(user=user)
+        return {
+            "token": token
+        }

@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from apps.teams.permissions import TeamModelAccessPermissions
 from django.conf import settings
 from django.http import JsonResponse, HttpResponse
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
 from rest_framework.exceptions import (
     PermissionDenied,
 )
@@ -69,7 +69,7 @@ class CtiButlerProxyView(APIView):
 # Create your views here.
 class AdminCtiButlerProxyView(APIView):
     permission_classes = [IsAdminUser]
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    authentication_classes = [SessionAuthentication, BasicAuthentication, TokenAuthentication]
 
     def dispatch(self, request, *args, **kwargs):
         self.args = args
