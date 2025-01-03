@@ -30,7 +30,7 @@ def merge_components(comp1, comp2):
 
 def merge_paths(paths1, paths2):
     merged = {}
-    
+
     def add_to_merged_dict(paths):
         for original_path, methods in paths.items():
             path = original_path.replace('/ctibutler_api/api/v1/', '/v1/')
@@ -41,7 +41,7 @@ def merge_paths(paths1, paths2):
                     if method not in merged[path]:
                         merged[path][method] = details
                     else:
-                        merged[path][method].update(details)        
+                        merged[path][method].update(details)
     add_to_merged_dict(paths1)
     add_to_merged_dict(paths2)
 
@@ -70,6 +70,7 @@ def extract_paths_and_schemas(openapi_data):
 
     return path_schemas
 
+
 def find_unresolved_references(schemas):
     # Gather all component refs
     components = schemas
@@ -95,18 +96,20 @@ def find_unresolved_references(schemas):
         check_refs(schema)
     return results
 
+
 class SchemaView(APIView):
     renderer_classes = [
         OpenApiYamlRenderer, OpenApiYamlRenderer2, OpenApiJsonRenderer, OpenApiJsonRenderer2
     ]
     permission_classes = spectacular_settings.SERVE_PERMISSIONS
     authentication_classes = []
-    generator_class= spectacular_settings.DEFAULT_GENERATOR_CLASS
+    generator_class = spectacular_settings.DEFAULT_GENERATOR_CLASS
     serve_public: bool = spectacular_settings.SERVE_PUBLIC
     urlconf = spectacular_settings.SERVE_URLCONF
     api_version = None
     custom_settings = None
     patterns = None
+
     def get(self, request, *args, **kwargs):
         if isinstance(self.urlconf, list) or isinstance(self.urlconf, tuple):
             ModuleWrapper = namedtuple('ModuleWrapper', ['urlpatterns'])
@@ -131,14 +134,9 @@ class SchemaView(APIView):
             ctibutler_schema.get('components', {})
         )
 
-        merged_paths = merge_paths(ctibutler_schema.get('paths', {}), api_schema.get('paths', {}))
-        merged_components['securitySchemes'] = {
-            'api_key': {
-                'type': 'apiKey',
-                'in': 'header',
-                'name': 'API-KEY'
-            }
-        }
+        merged_paths = merge_paths(ctibutler_schema.get(
+            'paths', {}), api_schema.get('paths', {}))
+        merged_components['securitySchemes'] = self.get_authentication_schemas()
         merged_swagger = {
             'openapi': '3.0.0',
             'info': {
@@ -149,7 +147,7 @@ class SchemaView(APIView):
             'components': merged_components,
             'paths': merged_paths
         }
-        
+
         self.resolve_schemas(merged_swagger)
         return JsonResponse(merged_swagger)
 
@@ -172,14 +170,58 @@ class SchemaView(APIView):
 
     def get_schema_path(self):
         return os.path.join('ctibutler_api', 'templates', 'ctibutler_api', 'schema.json')
-    
+
+    def get_authentication_schemas(self):
+        return {
+            'api_key': {
+                'type': 'apiKey',
+                'in': 'header',
+                'name': 'API-KEY'
+            }
+        }
+
     def _get_schema_response(self, request):
-        version = self.api_version or request.version or self._get_version_parameter(request)
-        generator = self.generator_class(urlconf=self.urlconf, api_version=version, patterns=self.patterns)
+        return {}
+
+    def _get_filename(self, request, version):
+        return "{title}{version}.{suffix}".format(
+            title=spectacular_settings.TITLE or 'schema',
+            version=f' ({version})' if version else '',
+            suffix=self.perform_content_negotiation(
+                request, force=True)[0].format
+        )
+
+    def _get_version_parameter(self, request):
+        return None
+
+
+class AdminSchemaView(SchemaView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAdminUser]
+
+    def resolve_schemas(self, merged_swagger):
+        pass
+
+    def get_authentication_schemas(self):
+        return {
+            'api_key': {
+                "type": "apiKey",
+                "in": "header",
+                "name": "Authorization",
+                "description": "Token-based authentication with required prefix \"Token\""
+            }
+        }
+
+    def _get_schema_response(self, request):
+        version = self.api_version or request.version or self._get_version_parameter(
+            request)
+        generator = self.generator_class(
+            urlconf=self.urlconf, api_version=version, patterns=self.patterns)
         data = generator.get_schema(request=request, public=self.serve_public)
         path_items = data["paths"].items()
 
-        filtered_paths = list(filter(lambda item: 'user' in item[0], path_items))
+        filtered_paths = list(
+            filter(lambda item: 'user' in item[0], path_items))
         path_dict = {}
         security_requirement = [{'api_key': []}]
         for key, value in filtered_paths:
@@ -196,27 +238,8 @@ class SchemaView(APIView):
         data["paths"] = path_dict
         return data
 
-    def _get_filename(self, request, version):
-        return "{title}{version}.{suffix}".format(
-            title=spectacular_settings.TITLE or 'schema',
-            version=f' ({version})' if version else '',
-            suffix=self.perform_content_negotiation(request, force=True)[0].format
-        )
-
-    def _get_version_parameter(self, request):
-        return None
-
-class AdminSchemaView(SchemaView):
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAdminUser]
-
-    def resolve_schemas(self, merged_swagger):
-        pass
-
     def get_schema_path(self):
         return os.path.join('ctibutler_api', 'templates', 'ctibutler_api', 'admin-schema.json')
-
-from django.contrib.auth.decorators import login_required
 
 
 class AdminSwaggerView(SpectacularSwaggerView):
